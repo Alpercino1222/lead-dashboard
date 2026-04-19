@@ -248,7 +248,6 @@ app.post('/api/search', async (req, res) => {
         if (detailsData.status !== 'OK') continue;
 
         const d = detailsData.result;
-        if (d.website) continue; // bereits Website → überspringen
 
         const leadLat = d.geometry?.location?.lat ?? place.geometry?.location?.lat ?? center.lat;
         const leadLng = d.geometry?.location?.lng ?? place.geometry?.location?.lng ?? center.lng;
@@ -260,6 +259,7 @@ app.post('/api/search', async (req, res) => {
           kategorie,
           adresse:          d.formatted_address || '',
           telefon:          d.formatted_phone_number || '',
+          website:          d.website || '',
           status:           'neu',
           mapsUrl:          d.url || `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
           lat:              leadLat,

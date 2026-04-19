@@ -453,17 +453,20 @@ async function deleteSelected() {
 async function deleteAll() {
   const filtered = getFiltered();
   if(!filtered.length) return toast('Keine Leads vorhanden','error');
-  const ids = filtered.map(l=>l.id);
-  const label = activeFilter==='alle' ? `alle ${ids.length} Leads` : `alle ${ids.length} Leads in dieser Ansicht`;
+  // Favoriten IMMER ausnehmen
+  const ids = filtered.filter(l=>l.status!=='favorit').map(l=>l.id);
+  const favCount = filtered.filter(l=>l.status==='favorit').length;
+  if(!ids.length) return toast('Nur Favoriten vorhanden – nichts gelöscht','');
+  const favHint = favCount>0 ? ` (${favCount} Favorit${favCount>1?'en':''} bleiben erhalten)` : '';
   showConfirm(
     `${ids.length} Leads löschen?`,
-    `Es werden ${label} unwiderruflich gelöscht!`,
+    `Alle Leads in dieser Ansicht werden unwiderruflich gelöscht!${favHint}`,
     async () => {
       const r = await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
       if(!r.ok){ toast('Fehler beim Löschen','error'); return; }
       leads = leads.filter(l=>!ids.includes(l.id));
       selected.clear(); renderAll();
-      toast(`${ids.length} Leads gelöscht`,'success');
+      toast(`${ids.length} Leads gelöscht${favHint}`,'success');
     }
   );
 }
@@ -591,7 +594,7 @@ function renderTable(){
       :'<span style="color:var(--border)">–</span>';
     return `<tr class="${isSel?'selected':''}">
       <td><input type="checkbox" class="row-check" ${isSel?'checked':''} onchange="toggleRow('${l.id}',this)"></td>
-      <td class="td-name">${esc(l.name)}<small>${esc(l.kategorie)}${l.suchPLZ?' · PLZ '+l.suchPLZ:''}</small></td>
+      <td class="td-name">${esc(l.name)}<small>${esc(l.kategorie)}${l.suchPLZ?' · PLZ '+l.suchPLZ:''}${l.website?` · <span style="color:#f59e0b" title="${esc(l.website)}">🌐 hat Website</span>`:' · <span style="color:#86efac">✓ kein Web</span>'}</small></td>
       <td><span class="kat-tag">${esc(l.kategorie)}</span></td>
       <td class="td-addr">${esc(l.adresse)}</td>
       <td style="text-align:center">${dist}</td>
@@ -639,6 +642,7 @@ function renderCards(){
         <div class="card-title">
           <div class="card-name">${esc(l.name)}</div>
           <span class="card-kat">${esc(l.kategorie)}</span>
+          ${l.website?`<span style="font-size:10px;color:#f59e0b;margin-left:4px" title="${esc(l.website)}">🌐 hat Website</span>`:`<span style="font-size:10px;color:#86efac;margin-left:4px">✓ kein Web</span>`}
           <div class="card-addr">${esc(l.adresse)}</div>
         </div>
         <button class="card-fav-btn" onclick="toggleFavorit('${l.id}')" title="${isFav?'Favorit entfernen':'Als Favorit markieren'}">${isFav?'⭐':'☆'}</button>
