@@ -214,6 +214,7 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       <option value="Restaurant">🍽️ Restaurant</option>
       <option value="Reinigung">🧹 Reinigung</option>
       <option value="Physiotherapie">💪 Physiotherapie</option>
+      <option value="Tierarzt">🐾 Tierarzt</option>
     </select>
     <input class="si" id="plzInput" type="text" placeholder="PLZ" value="67574" style="width:80px">
     <select class="si" id="radiusSelect">
@@ -508,7 +509,7 @@ function showConfirm(title,text,cb){
   document.getElementById('confirmModal').classList.add('open');
 }
 function closeConfirm(){document.getElementById('confirmModal').classList.remove('open');confirmCallback=null;}
-document.getElementById('confirmOk').onclick=()=>{closeConfirm();confirmCallback&&confirmCallback();};
+document.getElementById('confirmOk').onclick=()=>{const cb=confirmCallback;closeConfirm();cb&&cb();};
 document.getElementById('confirmModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeConfirm();});
 
 // ── Selection ──────────────────────────────────────────────

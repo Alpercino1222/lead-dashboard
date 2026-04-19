@@ -139,6 +139,7 @@ const KATEGORIEN_MAP = {
   'Restaurant':     'restaurant',
   'Reinigung':      'laundry',
   'Physiotherapie': 'physiotherapist',
+  'Tierarzt':       'veterinary_care',
 };
 
 const STATUS_VALUES = ['neu', 'kontaktiert', 'zusage', 'absage', 'unentschieden', 'favorit', 'todo'];
