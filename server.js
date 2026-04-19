@@ -11,7 +11,8 @@ const app = express();
 app.use(express.json());
 
 // ── Passwort-Schutz ──────────────────────────────────────────────
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'geheim123';
+const DASHBOARD_EMAIL    = process.env.DASHBOARD_EMAIL    || 'alper.koc1987@gmail.com';
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'Leyla2019#';
 const sessions = new Set();
 
 function makeToken() {
@@ -46,7 +47,8 @@ app.get('/login', (req, res) => {
   <h1>Lead Dashboard</h1>
   <p>Bitte melde dich an</p>
   <form method="POST" action="/login">
-    <input type="password" name="password" placeholder="Passwort" autofocus required>
+    <input type="email" name="email" placeholder="E-Mail" autofocus required>
+    <input type="password" name="password" placeholder="Passwort" required>
     <button type="submit">Anmelden</button>
   </form>
   ${req.query.err ? '<div class="err" style="display:block">❌ Falsches Passwort</div>' : ''}
@@ -58,7 +60,7 @@ app.get('/login', (req, res) => {
 // Login verarbeiten
 app.use(express.urlencoded({ extended: false }));
 app.post('/login', (req, res) => {
-  if (req.body.password === DASHBOARD_PASSWORD) {
+  if (req.body.email === DASHBOARD_EMAIL && req.body.password === DASHBOARD_PASSWORD) {
     const token = makeToken();
     sessions.add(token);
     res.setHeader('Set-Cookie', `ld_session=${token}; Path=/; HttpOnly; Max-Age=86400`);
