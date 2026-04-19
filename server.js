@@ -141,7 +141,7 @@ const KATEGORIEN_MAP = {
   'Physiotherapie': 'physiotherapist',
 };
 
-const STATUS_VALUES = ['neu', 'kontaktiert', 'zusage', 'absage', 'unentschieden'];
+const STATUS_VALUES = ['neu', 'kontaktiert', 'zusage', 'absage', 'unentschieden', 'favorit', 'todo'];
 
 // Haversine-Distanz in km
 function haversine(lat1, lon1, lat2, lon2) {
@@ -363,6 +363,21 @@ app.delete('/api/leads/:id', (req, res) => {
   leads.splice(idx, 1);
   writeLeads(leads);
   res.json({ ok: true });
+});
+
+// DELETE /api/leads – mehrere oder alle löschen
+app.delete('/api/leads', (req, res) => {
+  const { ids, filter } = req.body; // ids: string[] ODER filter: 'all'|statuswert
+  let leads = readLeads();
+  if (filter === 'all') {
+    leads = [];
+  } else if (Array.isArray(ids)) {
+    leads = leads.filter(l => !ids.includes(l.id));
+  } else if (filter) {
+    leads = leads.filter(l => l.status !== filter);
+  }
+  writeLeads(leads);
+  res.json({ ok: true, remaining: leads.length });
 });
 
 // POST /api/refresh-ratings – holt Bewertungen für alle Leads ohne Rating
