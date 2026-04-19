@@ -269,9 +269,8 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
     <span class="bulk-info" id="bulkInfo">Massenaktionen</span>
     <button class="btn btn-outline btn-sm" onclick="selectAll()">Alle ✓</button>
     <button class="btn btn-outline btn-sm" onclick="clearSelection()">✗ Aufheben</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 Auswahl</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteVisible()">🗑 Sichtbare</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteAll()">⚠️ Alle</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 Ausgewählte löschen</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteAll()">⚠️ Alle löschen</button>
   </div>
 
   <!-- Filter-Tabs -->
@@ -420,43 +419,52 @@ async function toggleFavorit(id) {
 }
 
 async function deleteSingle(id) {
-  showConfirm('Lead löschen?','Dieser Lead wird dauerhaft gelöscht.', async()=>{
-    await fetch(`/api/leads/${id}`,{method:'DELETE'});
-    leads = leads.filter(l=>l.id!==id);
-    selected.delete(id);
-    renderAll();
-    toast('Gelöscht','success');
-  });
+  showConfirm(
+    'Lead löschen?',
+    'Dieser Lead wird dauerhaft gelöscht.',
+    async () => {
+      const r = await fetch(`/api/leads/${id}`,{method:'DELETE'});
+      if(!r.ok){ toast('Fehler beim Löschen','error'); return; }
+      leads = leads.filter(l=>l.id!==id);
+      selected.delete(id);
+      renderAll();
+      toast('Lead gelöscht','success');
+    }
+  );
 }
 
 async function deleteSelected() {
   if(!selected.size) return toast('Keine Leads ausgewählt','error');
-  showConfirm(`${selected.size} Leads löschen?','Alle markierten Leads werden dauerhaft gelöscht.`, async()=>{
-    const ids = [...selected];
-    await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
-    leads = leads.filter(l=>!ids.includes(l.id));
-    selected.clear(); renderAll();
-    toast(`${ids.length} Leads gelöscht`,'success');
-  });
-}
-
-async function deleteVisible() {
-  const ids = getFiltered().map(l=>l.id);
-  if(!ids.length) return;
-  showConfirm(`${ids.length} sichtbare Leads löschen?','Alle aktuell angezeigten Leads werden gelöscht.`, async()=>{
-    await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
-    leads = leads.filter(l=>!ids.includes(l.id));
-    selected.clear(); renderAll();
-    toast(`${ids.length} Leads gelöscht`,'success');
-  });
+  const ids = [...selected];
+  showConfirm(
+    `${ids.length} Leads löschen?`,
+    'Alle markierten Leads werden dauerhaft gelöscht.',
+    async () => {
+      const r = await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+      if(!r.ok){ toast('Fehler beim Löschen','error'); return; }
+      leads = leads.filter(l=>!ids.includes(l.id));
+      selected.clear(); renderAll();
+      toast(`${ids.length} Leads gelöscht`,'success');
+    }
+  );
 }
 
 async function deleteAll() {
-  showConfirm('ALLE Leads löschen?',`Alle ${leads.length} Leads werden unwiderruflich gelöscht!`, async()=>{
-    await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:'all'})});
-    leads=[]; selected.clear(); renderAll();
-    toast('Alle Leads gelöscht','success');
-  });
+  const filtered = getFiltered();
+  if(!filtered.length) return toast('Keine Leads vorhanden','error');
+  const ids = filtered.map(l=>l.id);
+  const label = activeFilter==='alle' ? `alle ${ids.length} Leads` : `alle ${ids.length} Leads in dieser Ansicht`;
+  showConfirm(
+    `${ids.length} Leads löschen?`,
+    `Es werden ${label} unwiderruflich gelöscht!`,
+    async () => {
+      const r = await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+      if(!r.ok){ toast('Fehler beim Löschen','error'); return; }
+      leads = leads.filter(l=>!ids.includes(l.id));
+      selected.clear(); renderAll();
+      toast(`${ids.length} Leads gelöscht`,'success');
+    }
+  );
 }
 
 async function refreshRatings(silent=false) {
