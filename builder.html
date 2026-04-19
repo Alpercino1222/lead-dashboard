@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Builder</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --eb:#111827;--es:#1f2937;--eb2:#374151;--et:#f3f4f6;--em:#9ca3af;
+  --ea:#6366f1;--ea2:#4f46e5;--eg:#22c55e;--er:#ef4444;
+  --sw:220px;--rw:272px;--th:56px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--eb);color:var(--et);height:100vh;overflow:hidden;font-size:13px}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--th);background:var(--es);border-bottom:1px solid var(--eb2);display:flex;align-items:center;gap:10px;padding:0 14px;position:fixed;top:0;left:0;right:0;z-index:200}
+.back-btn{background:transparent;border:1px solid var(--eb2);color:var(--em);padding:5px 11px;border-radius:7px;cursor:pointer;font-size:12px;transition:all .15s;white-space:nowrap}
+.back-btn:hover{color:var(--et);border-color:var(--et)}
+.biz-name{font-weight:700;font-size:14px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.sep{width:1px;height:28px;background:var(--eb2);flex-shrink:0}
+.dev-sw{display:flex;gap:2px;background:var(--eb);padding:3px;border-radius:7px;border:1px solid var(--eb2)}
+.dev-btn{background:transparent;border:none;color:var(--em);padding:4px 9px;border-radius:5px;cursor:pointer;font-size:13px;transition:all .15s}
+.dev-btn.active{background:var(--ea);color:#fff}
+.ai-bar{display:flex;gap:6px;flex:1;min-width:0}
+.ai-input{flex:1;background:var(--eb);border:1px solid var(--eb2);color:var(--et);padding:6px 11px;border-radius:7px;font-size:12px;outline:none;min-width:0;transition:border-color .15s}
+.ai-input:focus{border-color:var(--ea)}
+.ai-input::placeholder{color:var(--em)}
+.ebtn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.ebtn:disabled{opacity:.5;cursor:not-allowed}
+.ebtn:hover:not(:disabled){filter:brightness(1.1)}
+.ebtn-ai{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff}
+.ebtn-save{background:var(--eg);color:#fff}
+.ebtn-export{background:var(--es);border:1px solid var(--eb2);color:var(--et)}
+.ebtn-danger{background:var(--er);color:#fff}
+
+/* ── LAYOUT ── */
+.editor-body{display:flex;height:calc(100vh - var(--th));margin-top:var(--th)}
+
+/* ── LEFT SIDEBAR ── */
+.sb-left{width:var(--sw);background:var(--es);border-right:1px solid var(--eb2);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sb-head{padding:11px 13px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--em);border-bottom:1px solid var(--eb2)}
+.sec-list{flex:1;overflow-y:auto;padding:6px}
+.sec-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;cursor:pointer;transition:background .12s;border:1px solid transparent;margin-bottom:2px}
+.sec-item:hover{background:var(--eb)}
+.sec-item.active{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4)}
+.sec-icon{font-size:15px;flex-shrink:0}
+.sec-info{flex:1;min-width:0}
+.sec-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-type{font-size:10px;color:var(--em)}
+.add-bar{padding:8px;border-top:1px solid var(--eb2)}
+.add-btn{width:100%;padding:7px;background:var(--eb);border:1px dashed var(--eb2);color:var(--em);border-radius:7px;cursor:pointer;font-size:12px;transition:all .15s}
+.add-btn:hover{border-color:var(--ea);color:var(--ea)}
+.add-panel{background:var(--eb);border:1px solid var(--eb2);border-radius:7px;margin-top:6px;overflow:hidden;display:none}
+.add-panel.open{display:block}
+.add-type{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:transparent;border:none;color:var(--et);font-size:12px;cursor:pointer;text-align:left;transition:background .12s}
+.add-type:hover{background:var(--es)}
+
+/* ── CANVAS ── */
+.canvas-wrap{flex:1;overflow-y:auto;background:#374151;padding:24px;display:flex;justify-content:center;align-items:flex-start}
+.canvas{background:#fff;min-height:100%;box-shadow:0 4px 48px rgba(0,0,0,.5);transition:width .3s;font-family:'Segoe UI',system-ui,sans-serif;position:relative}
+.canvas.desktop{width:100%;max-width:1280px}
+.canvas.tablet{width:768px}
+.canvas.mobile{width:390px}
+
+/* ── SECTION WRAPPER ── */
+.sw{position:relative}
+.sw:hover .stb,.sw:hover .slabel{opacity:1;pointer-events:all}
+.stb{position:absolute;top:8px;right:8px;display:flex;gap:3px;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);border-radius:8px;padding:4px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:20}
+.stb-btn{background:transparent;border:none;color:#e2e8f0;padding:5px 8px;border-radius:5px;cursor:pointer;font-size:12px;transition:background .12s}
+.stb-btn:hover{background:rgba(255,255,255,.15)}
+.stb-btn.del:hover{background:rgba(239,68,68,.4)}
+.slabel{position:absolute;top:8px;left:8px;background:rgba(99,102,241,.9);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:20}
+
+/* ── INLINE EDIT ── */
+[contenteditable]{outline:none;border-radius:3px;transition:box-shadow .15s;min-width:4px;display:inline-block}
+[contenteditable]:hover{box-shadow:0 0 0 2px rgba(99,102,241,.3);cursor:text}
+[contenteditable]:focus{box-shadow:0 0 0 2px #6366f1}
+
+/* ── IMAGE ZONES ── */
+.imgz{position:relative;cursor:pointer;display:block}
+.imgz .idrop{position:absolute;inset:0;background:rgba(99,102,241,0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:transparent;font-size:11px;font-weight:600;transition:all .2s;z-index:5;border-radius:inherit}
+.imgz:hover .idrop,.imgz.drag-over .idrop{background:rgba(99,102,241,.75);color:#fff}
+.imgz.drag-over .idrop{background:rgba(99,102,241,.9)}
+
+/* ── RIGHT SIDEBAR ── */
+.sb-right{width:var(--rw);background:var(--es);border-left:1px solid var(--eb2);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.panel-body{flex:1;overflow-y:auto;padding:12px}
+.ph{display:flex;align-items:center;justify-content:center;height:100%;color:var(--em);font-size:12px;text-align:center;padding:20px;line-height:1.6}
+.pg{margin-bottom:14px}
+.pg-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--em);margin-bottom:8px}
+.pr{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.pl{font-size:11px;color:var(--em);width:72px;flex-shrink:0}
+.pi{flex:1;background:var(--eb);border:1px solid var(--eb2);color:var(--et);padding:5px 7px;border-radius:5px;font-size:12px;outline:none;transition:border-color .12s}
+.pi:focus{border-color:var(--ea)}
+.pc{width:30px;height:26px;border:1px solid var(--eb2);border-radius:5px;padding:2px;background:var(--eb);cursor:pointer;flex-shrink:0}
+.psel{flex:1;background:var(--eb);border:1px solid var(--eb2);color:var(--et);padding:5px 7px;border-radius:5px;font-size:12px;outline:none}
+.panel-action{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.panel-action .ebtn{width:100%;justify-content:center;font-size:11px;padding:6px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(70px);background:#1f2937;color:#fff;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transition:all .3s;z-index:9999;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.success{background:#065f46}
+#toast.error{background:#7f1d1d}
+
+/* ── LOADER ── */
+.ldwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:14px;color:#94a3b8}
+.spin{width:32px;height:32px;border:3px solid rgba(99,102,241,.3);border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════════
+   WEBSITE PREVIEW STYLES
+═══════════════════════════════════════════════ */
+.ws-hero{min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.ws-hero-ov{position:absolute;inset:0;background:rgba(0,0,0,.42);pointer-events:none}
+.ws-hero-cnt{position:relative;z-index:2;max-width:720px;width:100%}
+.ws-hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;margin-bottom:14px;line-height:1.1}
+.ws-hero .sub{font-size:clamp(1rem,2.5vw,1.35rem);margin-bottom:10px;opacity:.92}
+.ws-hero .desc{font-size:1rem;margin-bottom:28px;opacity:.8;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6}
+.ws-hero .hbtn{display:inline-block;padding:14px 34px;border-radius:50px;font-size:1rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.ws-hero .hbtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.hero-imgbtn{position:absolute;bottom:14px;right:14px;z-index:10;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11px;cursor:pointer;backdrop-filter:blur(6px);transition:background .15s}
+.hero-imgbtn:hover{background:rgba(99,102,241,.8)}
+
+.ws-services{padding:80px 40px}
+.ws-services h2{text-align:center;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:50px}
+.ws-sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;max-width:1100px;margin:0 auto}
+.ws-sc{padding:32px 24px;border-radius:16px;text-align:center;transition:transform .2s,box-shadow .2s}
+.ws-sc:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.ws-sc-icon{font-size:2.4rem;margin-bottom:14px;display:block}
+.ws-sc-title{font-size:1.15rem;font-weight:700;margin-bottom:9px}
+.ws-sc-desc{font-size:.92rem;line-height:1.65;opacity:.78}
+
+.ws-gallery{padding:80px 40px}
+.ws-gallery h2{text-align:center;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:50px}
+.ws-gg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1100px;margin:0 auto}
+.ws-gi{aspect-ratio:4/3;border-radius:12px;overflow:hidden;position:relative}
+.ws-gi img{width:100%;height:100%;object-fit:cover}
+.ws-gph{width:100%;height:100%;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#94a3b8;font-size:12px}
+
+.ws-reviews{padding:80px 40px}
+.ws-reviews h2{text-align:center;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:50px}
+.ws-rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:22px;max-width:1100px;margin:0 auto}
+.ws-rc{padding:28px;border-radius:16px;transition:transform .2s}
+.ws-rc:hover{transform:translateY(-2px)}
+.ws-stars{color:#f59e0b;font-size:1.15rem;margin-bottom:11px}
+.ws-rtxt{font-size:.93rem;line-height:1.65;margin-bottom:14px;font-style:italic;opacity:.85}
+.ws-rauth{font-weight:700;font-size:.9rem}
+
+.ws-contact{padding:80px 40px;text-align:center}
+.ws-contact h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:50px}
+.ws-cg{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.ws-ci{display:flex;flex-direction:column;align-items:center;gap:7px}
+.ws-cicon{font-size:2rem}
+.ws-clabel{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.55}
+.ws-cval{font-size:1.05rem;font-weight:600}
+
+.ws-footer{padding:30px 40px;text-align:center}
+.ws-fl{display:flex;gap:18px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.ws-fl a{color:inherit;opacity:.55;text-decoration:none;font-size:.88rem}
+.ws-fl a:hover{opacity:1}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--eb)}
+::-webkit-scrollbar-thumb{background:var(--eb2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <button class="back-btn" onclick="goBack()">← Dashboard</button>
+  <span class="biz-name" id="bizName">Lädt…</span>
+  <div class="sep"></div>
+  <div class="dev-sw">
+    <button class="dev-btn active" data-device="desktop" onclick="setDevice('desktop')" title="Desktop">🖥</button>
+    <button class="dev-btn" data-device="tablet" onclick="setDevice('tablet')" title="Tablet">📲</button>
+    <button class="dev-btn" data-device="mobile" onclick="setDevice('mobile')" title="Mobile">📱</button>
+  </div>
+  <div class="sep"></div>
+  <div class="ai-bar">
+    <input class="ai-input" id="aiInput" type="text"
+      placeholder="KI-Prompt: 'luxury style', 'dark mode', 'animations', 'modern', 'minimal'…"
+      onkeydown="if(event.key==='Enter')applyAI()">
+    <button class="ebtn ebtn-ai" id="aiBtn" onclick="applyAI()">✨ Apply AI</button>
+  </div>
+  <div class="sep"></div>
+  <button class="ebtn ebtn-save" id="saveBtn" onclick="saveWebsite()">💾 Speichern</button>
+  <button class="ebtn ebtn-export" onclick="exportHtml()">⬇ Export</button>
+</div>
+
+<!-- EDITOR BODY -->
+<div class="editor-body">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sb-left">
+    <div class="sb-head">Sections</div>
+    <div class="sec-list" id="secList"></div>
+    <div class="add-bar">
+      <button class="add-btn" onclick="toggleAddPanel()">＋ Section hinzufügen</button>
+      <div class="add-panel" id="addPanel">
+        <button class="add-type" onclick="addSection('hero')">🏠 Hero</button>
+        <button class="add-type" onclick="addSection('services')">⚙️ Leistungen</button>
+        <button class="add-type" onclick="addSection('gallery')">🖼 Galerie</button>
+        <button class="add-type" onclick="addSection('reviews')">⭐ Bewertungen</button>
+        <button class="add-type" onclick="addSection('contact')">📞 Kontakt</button>
+        <button class="add-type" onclick="addSection('footer')">📄 Footer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <div class="canvas desktop" id="canvas">
+      <div class="ldwrap"><div class="spin"></div><p>Wird geladen…</p></div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sb-right">
+    <div class="sb-head" id="panelTitle">Stil-Panel</div>
+    <div class="panel-body" id="panelBody">
+      <div class="ph" id="panelPH">Klicke auf eine Section<br>um Styles zu bearbeiten</div>
+      <div id="panelContent" style="display:none"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────────────
+const leadId = location.pathname.split('/').pop();
+let sd       = null;   // siteData
+let selId    = null;   // selected section id
+let dirty    = false;
+let autoTimer= null;
+
+const ICONS  = { hero:'🏠', services:'⚙️', gallery:'🖼', reviews:'⭐', contact:'📞', footer:'📄' };
+const LABELS = { hero:'Hero', services:'Leistungen', gallery:'Galerie', reviews:'Bewertungen', contact:'Kontakt', footer:'Footer' };
+
+// ─────────────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────────────
+async function boot() {
+  if (!leadId) { toast('Kein Lead-ID', 'error'); return; }
+  try {
+    const r = await fetch(`/api/builder/${leadId}`);
+    if (r.status === 404) { await generate(); return; }
+    sd = await r.json();
+    render();
+  } catch(e) { toast('Fehler: ' + e.message, 'error'); }
+}
+
+async function generate() {
+  canvas('<div class="ldwrap"><div class="spin"></div><p>KI generiert Website-Inhalt…</p></div>');
+  const r = await fetch(`/api/builder/${leadId}/generate`, { method:'POST' });
+  if (!r.ok) { const e=await r.json(); toast(e.error,'error'); return; }
+  sd = await r.json();
+  render(); toast('Website generiert!','success');
+}
+
+function canvas(html) { document.getElementById('canvas').innerHTML = html; }
+
+// ─────────────────────────────────────────────────────
+// Render
+// ─────────────────────────────────────────────────────
+function render() {
+  if (!sd) return;
+  document.getElementById('bizName').textContent = sd.businessName || 'Website';
+  const c = document.getElementById('canvas');
+  if (sd.globalStyles?.fontFamily) c.style.fontFamily = sd.globalStyles.fontFamily;
+  c.innerHTML = sd.sections.map(renderWrap).join('');
+  if (sd.globalStyles?.animations) addAnimCSS();
+  renderSecList();
+}
+
+function renderWrap(sec) {
+  return `<div class="sw" data-id="${sec.id}" onclick="onSectionClick('${sec.id}',event)">
+    <div class="slabel">${ICONS[sec.type]||'▪'} ${LABELS[sec.type]||sec.type}</div>
+    <div class="stb">
+      <button class="stb-btn" title="↑" onclick="moveS('${sec.id}',-1,event)">↑</button>
+      <button class="stb-btn" title="↓" onclick="moveS('${sec.id}',1,event)">↓</button>
+      <button class="stb-btn" title="Duplizieren" onclick="dupS('${sec.id}',event)">⧉</button>
+      <button class="stb-btn del" title="Löschen" onclick="delS('${sec.id}',event)">✕</button>
+    </div>
+    ${renderSec(sec)}
+  </div>`;
+}
+
+function renderSec(s) {
+  try {
+    switch(s.type) {
+      case 'hero':     return renderHero(s);
+      case 'services': return renderServices(s);
+      case 'gallery':  return renderGallery(s);
+      case 'reviews':  return renderReviews(s);
+      case 'contact':  return renderContact(s);
+      case 'footer':   return renderFooter(s);
+      default: return `<div style="padding:40px;text-align:center;color:#94a3b8">Unbekannt: ${s.type}</div>`;
+    }
+  } catch(e) { return `<div style="padding:40px;text-align:center;color:red">Render-Fehler: ${e.message}</div>`; }
+}
+
+// ─────────────────────────────────────────────────────
+// Section Renderers
+// ─────────────────────────────────────────────────────
+function renderHero(s) {
+  const d = s.data||{}, st = s.styles||{};
+  const pc = sd.globalStyles?.primaryColor||'#4f46e5';
+  const bg = d.backgroundImage ? `background-image:url('${d.backgroundImage}');background-size:cover;background-position:center;` : '';
+  return `
+  <div class="ws-hero" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#0f172a'};color:${st.color||'#fff'};${bg}">
+    ${d.backgroundImage ? '<div class="ws-hero-ov"></div>' : ''}
+    <div class="ws-hero-cnt">
+      <h1 contenteditable data-s="${s.id}" data-f="title" onblur="saveTxt(this)"
+          style="color:${st.color||'#fff'}">${esc(d.title||'Firmenname')}</h1>
+      <div class="sub" contenteditable data-s="${s.id}" data-f="subtitle" onblur="saveTxt(this)"
+           style="color:${st.color||'#fff'}">${esc(d.subtitle||'Ihr zuverlässiger Partner')}</div>
+      <div class="desc" contenteditable data-s="${s.id}" data-f="description" onblur="saveTxt(this)"
+           style="color:${st.color||'#fff'}">${esc(d.description||'Qualität und Vertrauen seit Jahren.')}</div>
+      <span class="hbtn" contenteditable data-s="${s.id}" data-f="buttonText" onblur="saveTxt(this)"
+            style="background:${pc};color:#fff">${esc(d.buttonText||'Jetzt kontaktieren')}</span>
+    </div>
+    <button class="hero-imgbtn" onclick="pickHeroBg('${s.id}')" title="Hintergrundbild ändern">🖼 Hintergrundbild</button>
+    <input type="file" id="heroFile-${s.id}" accept="image/*" style="display:none"
+           onchange="heroFileChosen(event,'${s.id}')">
+  </div>`;
+}
+
+function renderServices(s) {
+  const d = s.data||{}, st = s.styles||{};
+  const cardBg = st.backgroundColor==='#ffffff' ? '#f8fafc' : adjustColor(st.backgroundColor||'#fff', 15);
+  return `
+  <div class="ws-services" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#fff'};color:${st.color||'#1e293b'}">
+    <h2 contenteditable data-s="${s.id}" data-f="title" onblur="saveTxt(this)">${esc(d.title||'Unsere Leistungen')}</h2>
+    <div class="ws-sg">
+      ${(d.items||[]).map((it,i)=>`
+      <div class="ws-sc" style="background:${cardBg}">
+        <span class="ws-sc-icon" contenteditable data-s="${s.id}" data-f="items.${i}.icon" onblur="saveTxt(this)">${esc(it.icon||'⭐')}</span>
+        <div class="ws-sc-title" contenteditable data-s="${s.id}" data-f="items.${i}.title" onblur="saveTxt(this)">${esc(it.title||'')}</div>
+        <div class="ws-sc-desc" contenteditable data-s="${s.id}" data-f="items.${i}.description" onblur="saveTxt(this)">${esc(it.description||'')}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderGallery(s) {
+  const d = s.data||{}, st = s.styles||{};
+  return `
+  <div class="ws-gallery" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#f8fafc'};color:${st.color||'#1e293b'}">
+    <h2 contenteditable data-s="${s.id}" data-f="title" onblur="saveTxt(this)">${esc(d.title||'Galerie')}</h2>
+    <div class="ws-gg">
+      ${(d.images||[]).map((img,i)=>`
+      <div class="ws-gi imgz" data-s="${s.id}" data-f="images.${i}.url"
+           ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event,this)"
+           onclick="pickImg(this)">
+        ${img.url ? `<img src="${img.url}" alt="${esc(img.alt||'')}">` : `<div class="ws-gph"><span>🖼</span><span>Bild hochladen</span></div>`}
+        <div class="idrop"><span>📂 Bild ablegen</span><input type="file" accept="image/*" style="display:none" onchange="imgFileChosen(event,this.closest('.imgz'))"></div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderReviews(s) {
+  const d = s.data||{}, st = s.styles||{};
+  const cardBg = st.backgroundColor==='#ffffff' ? '#f8fafc' : adjustColor(st.backgroundColor||'#fff', 12);
+  return `
+  <div class="ws-reviews" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#fff'};color:${st.color||'#1e293b'}">
+    <h2 contenteditable data-s="${s.id}" data-f="title" onblur="saveTxt(this)">${esc(d.title||'Kundenstimmen')}</h2>
+    <div class="ws-rg">
+      ${(d.items||[]).map((r,i)=>`
+      <div class="ws-rc" style="background:${cardBg}">
+        <div class="ws-stars">${'★'.repeat(Math.min(5,r.rating||5))}</div>
+        <div class="ws-rtxt" contenteditable data-s="${s.id}" data-f="items.${i}.text" onblur="saveTxt(this)">${esc(r.text||'')}</div>
+        <div class="ws-rauth" contenteditable data-s="${s.id}" data-f="items.${i}.author" onblur="saveTxt(this)">${esc(r.author||'')}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderContact(s) {
+  const d = s.data||{}, st = s.styles||{};
+  const items = [
+    d.phone   && { icon:'📞', label:'Telefon',        field:'phone',   val:d.phone },
+    d.address && { icon:'📍', label:'Adresse',         field:'address', val:d.address },
+    d.email   && { icon:'✉️', label:'E-Mail',          field:'email',   val:d.email },
+    d.hours   && { icon:'🕐', label:'Öffnungszeiten', field:'hours',   val:d.hours },
+  ].filter(Boolean);
+  return `
+  <div class="ws-contact" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#0f172a'};color:${st.color||'#fff'}">
+    <h2 contenteditable data-s="${s.id}" data-f="title" onblur="saveTxt(this)">${esc(d.title||'Kontakt')}</h2>
+    <div class="ws-cg">
+      ${items.map(it=>`
+      <div class="ws-ci">
+        <div class="ws-cicon">${it.icon}</div>
+        <div class="ws-clabel">${it.label}</div>
+        <div class="ws-cval" contenteditable data-s="${s.id}" data-f="${it.field}" onblur="saveTxt(this)">${esc(it.val)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderFooter(s) {
+  const d = s.data||{}, st = s.styles||{};
+  return `
+  <div class="ws-footer" id="inner-${s.id}" style="background-color:${st.backgroundColor||'#020617'};color:${st.color||'#94a3b8'}">
+    <div contenteditable data-s="${s.id}" data-f="text" onblur="saveTxt(this)">${esc(d.text||'© 2025')}</div>
+    ${(d.links||[]).length ? `<div class="ws-fl">${(d.links||[]).map((l,i)=>`
+      <a href="#" contenteditable data-s="${s.id}" data-f="links.${i}.label" onblur="saveTxt(this)">${esc(l.label)}</a>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────
+// Section List (left sidebar)
+// ─────────────────────────────────────────────────────
+function renderSecList() {
+  document.getElementById('secList').innerHTML = (sd.sections||[]).map(s=>`
+    <div class="sec-item ${selId===s.id?'active':''}" data-id="${s.id}" onclick="scrollTo2('${s.id}')">
+      <span class="sec-icon">${ICONS[s.type]||'▪'}</span>
+      <div class="sec-info">
+        <div class="sec-name">${LABELS[s.type]||s.type}</div>
+      </div>
+    </div>`).join('');
+}
+
+function scrollTo2(id) {
+  selId = id;
+  renderSecList();
+  document.querySelector(`[data-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'start'});
+  showPanel(id);
+}
+
+// ─────────────────────────────────────────────────────
+// Section Click / Style Panel
+// ─────────────────────────────────────────────────────
+function onSectionClick(id, e) {
+  if (e.target.isContentEditable || e.target.closest('.stb') ||
+      e.target.closest('.hero-imgbtn') || e.target.closest('.imgz')) return;
+  selId = id;
+  renderSecList();
+  showPanel(id);
+}
+
+function showPanel(id) {
+  const s = sd.sections.find(x=>x.id===id); if (!s) return;
+  const st = s.styles||{}, g = sd.globalStyles||{};
+  document.getElementById('panelTitle').textContent = `${LABELS[s.type]||s.type} – Stil`;
+  document.getElementById('panelPH').style.display = 'none';
+  const pc = document.getElementById('panelContent');
+  pc.style.display = 'block';
+  pc.innerHTML = `
+  <div class="pg">
+    <div class="pg-title">Hintergrundfarbe</div>
+    <div class="pr">
+      <input type="color" class="pc" value="${st.backgroundColor||'#ffffff'}"
+        oninput="liveStyle('${id}','backgroundColor',this.value);syncColorTxt(this)">
+      <input type="text" class="pi" value="${st.backgroundColor||'#ffffff'}"
+        oninput="liveStyle('${id}','backgroundColor',this.value);syncColorPicker(this)">
+    </div>
+  </div>
+  <div class="pg">
+    <div class="pg-title">Textfarbe</div>
+    <div class="pr">
+      <input type="color" class="pc" value="${toHex(st.color||'#000000')}"
+        oninput="liveStyle('${id}','color',this.value);syncColorTxt(this)">
+      <input type="text" class="pi" value="${st.color||'#000000'}"
+        oninput="liveStyle('${id}','color',this.value);syncColorPicker(this)">
+    </div>
+  </div>
+  <div class="pg">
+    <div class="pg-title">Globale Einstellungen</div>
+    <div class="pr">
+      <span class="pl">Hauptfarbe</span>
+      <input type="color" class="pc" value="${toHex(g.primaryColor||'#4f46e5')}"
+        oninput="liveGlobal('primaryColor',this.value)">
+    </div>
+    <div class="pr">
+      <span class="pl">Schriftart</span>
+      <select class="psel" onchange="liveGlobal('fontFamily',this.value)">
+        ${[
+          ['Segoe UI, system-ui, sans-serif','System (Standard)'],
+          ['Georgia, serif','Georgia (Serif)'],
+          ['Arial, sans-serif','Arial'],
+          ['Helvetica Neue, sans-serif','Helvetica'],
+          ['Times New Roman, serif','Times New Roman'],
+          ['Courier New, monospace','Courier New'],
+        ].map(([v,l])=>`<option value="${v}" ${g.fontFamily===v?'selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="pr">
+      <span class="pl">Animationen</span>
+      <select class="psel" onchange="liveGlobal('animations',this.value==='true')">
+        <option value="false" ${!g.animations?'selected':''}>Aus</option>
+        <option value="true"  ${g.animations?'selected':''}>Ein</option>
+      </select>
+    </div>
+  </div>
+  <div class="pg">
+    <div class="pg-title">Section-Aktionen</div>
+    <div class="panel-action">
+      <button class="ebtn ebtn-save" onclick="moveS('${id}',-1)">↑ Nach oben</button>
+      <button class="ebtn ebtn-save" onclick="moveS('${id}',1)">↓ Nach unten</button>
+      <button class="ebtn ebtn-export" onclick="dupS('${id}')">⧉ Duplizieren</button>
+      <button class="ebtn ebtn-danger" onclick="delS('${id}')">✕ Löschen</button>
+    </div>
+  </div>`;
+}
+
+function syncColorTxt(picker) {
+  const row = picker.closest('.pr');
+  if (row) { const txt = row.querySelector('input[type="text"]'); if(txt) txt.value = picker.value; }
+}
+function syncColorPicker(txt) {
+  const row = txt.closest('.pr');
+  if (row) { const p = row.querySelector('input[type="color"]'); if(p) { try{p.value=txt.value}catch(e){} } }
+}
+
+// ─────────────────────────────────────────────────────
+// Live Style Updates
+// ─────────────────────────────────────────────────────
+function liveStyle(id, prop, val) {
+  const s = sd.sections.find(x=>x.id===id); if(!s) return;
+  if (!s.styles) s.styles = {};
+  s.styles[prop] = val;
+  const inner = document.querySelector(`#inner-${id}`);
+  if (inner) { inner.style[prop] = val; }
+  markDirty();
+}
+
+function liveGlobal(prop, val) {
+  if (!sd.globalStyles) sd.globalStyles = {};
+  sd.globalStyles[prop] = val;
+  if (prop === 'fontFamily') document.getElementById('canvas').style.fontFamily = val;
+  if (prop === 'primaryColor') {
+    // re-render hero buttons
+    sd.sections.filter(s=>s.type==='hero').forEach(s=>{
+      const btn = document.querySelector(`#inner-${s.id} .hbtn`);
+      if (btn) btn.style.background = val;
+    });
+  }
+  if (prop === 'animations') { if(val) addAnimCSS(); }
+  markDirty();
+}
+
+// ─────────────────────────────────────────────────────
+// Inline Text Editing
+// ─────────────────────────────────────────────────────
+function saveTxt(el) {
+  const sectionId = el.dataset.s;
+  const field = el.dataset.f;
+  const val = el.innerText.trim();
+  const s = sd.sections.find(x=>x.id===sectionId); if (!s) return;
+  const parts = field.split('.');
+  if (parts.length === 1) {
+    s.data[field] = val;
+  } else if (parts.length === 3) {
+    const [arr, idx, key] = parts;
+    if (s.data[arr]?.[+idx]) s.data[arr][+idx][key] = val;
+  }
+  markDirty();
+}
+
+// ─────────────────────────────────────────────────────
+// Section CRUD
+// ─────────────────────────────────────────────────────
+function onSectionClick(id, e) {
+  if (e.target.isContentEditable || e.target.closest('.stb') ||
+      e.target.tagName === 'INPUT' || e.target.closest('.hero-imgbtn') ||
+      e.target.closest('.imgz')) return;
+  selId = id;
+  renderSecList();
+  showPanel(id);
+}
+
+function moveS(id, dir, e) {
+  if(e) e.stopPropagation();
+  const i = sd.sections.findIndex(s=>s.id===id);
+  const ni = i + dir;
+  if (ni < 0 || ni >= sd.sections.length) return;
+  const [sec] = sd.sections.splice(i, 1);
+  sd.sections.splice(ni, 0, sec);
+  markDirty(); render();
+}
+
+function dupS(id, e) {
+  if(e) e.stopPropagation();
+  const i = sd.sections.findIndex(s=>s.id===id);
+  const copy = JSON.parse(JSON.stringify(sd.sections[i]));
+  copy.id = copy.id + '-' + Date.now();
+  sd.sections.splice(i+1, 0, copy);
+  markDirty(); render();
+}
+
+function delS(id, e) {
+  if(e) e.stopPropagation();
+  if (!confirm('Section wirklich löschen?')) return;
+  sd.sections = sd.sections.filter(s=>s.id!==id);
+  if (selId === id) { selId = null; document.getElementById('panelPH').style.display=''; document.getElementById('panelContent').style.display='none'; }
+  markDirty(); render();
+}
+
+const DEFAULTS = {
+  hero:     { id:'hero-',     type:'hero',     data:{title:'Neuer Hero',subtitle:'Ihr Slogan',description:'Beschreibung',buttonText:'Kontakt',backgroundImage:''},     styles:{backgroundColor:'#0f172a',color:'#ffffff'} },
+  services: { id:'services-', type:'services', data:{title:'Unsere Leistungen',items:[{id:'si1',icon:'⭐',title:'Leistung 1',description:'Beschreibung'},{id:'si2',icon:'🔧',title:'Leistung 2',description:'Beschreibung'},{id:'si3',icon:'✅',title:'Leistung 3',description:'Beschreibung'}]}, styles:{backgroundColor:'#ffffff',color:'#1e293b'} },
+  gallery:  { id:'gallery-',  type:'gallery',  data:{title:'Galerie',images:[{id:'gi1',url:'',alt:'Bild 1'},{id:'gi2',url:'',alt:'Bild 2'},{id:'gi3',url:'',alt:'Bild 3'}]}, styles:{backgroundColor:'#f8fafc',color:'#1e293b'} },
+  reviews:  { id:'reviews-',  type:'reviews',  data:{title:'Kundenstimmen',items:[{id:'ri1',author:'Kunde A',rating:5,text:'Sehr zufrieden!'},{id:'ri2',author:'Kunde B',rating:5,text:'Empfehlenswert.'},{id:'ri3',author:'Kunde C',rating:5,text:'Top Leistung!'}]}, styles:{backgroundColor:'#ffffff',color:'#1e293b'} },
+  contact:  { id:'contact-',  type:'contact',  data:{title:'Kontakt',phone:'06242 123456',address:'Musterstraße 1, 67574 Osthofen',email:'',hours:'Mo–Fr 9–18 Uhr'}, styles:{backgroundColor:'#0f172a',color:'#ffffff'} },
+  footer:   { id:'footer-',   type:'footer',   data:{text:'© 2025 Unternehmen',links:[{label:'Impressum',url:'#'},{label:'Datenschutz',url:'#'}]}, styles:{backgroundColor:'#020617',color:'#94a3b8'} },
+};
+
+function addSection(type) {
+  const def = JSON.parse(JSON.stringify(DEFAULTS[type]));
+  def.id = def.id + Date.now();
+  sd.sections.push(def);
+  document.getElementById('addPanel').classList.remove('open');
+  markDirty(); render();
+  setTimeout(()=>{ document.querySelector(`[data-id="${def.id}"]`)?.scrollIntoView({behavior:'smooth'}); }, 80);
+}
+
+function toggleAddPanel() {
+  document.getElementById('addPanel').classList.toggle('open');
+}
+
+// ─────────────────────────────────────────────────────
+// Image Handling
+// ─────────────────────────────────────────────────────
+function pickHeroBg(id) { document.getElementById(`heroFile-${id}`)?.click(); }
+function heroFileChosen(e, id) {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const s = sd.sections.find(x=>x.id===id); if(!s) return;
+    s.data.backgroundImage = ev.target.result;
+    markDirty();
+    const wrap = document.querySelector(`[data-id="${id}"]`);
+    if (wrap) { wrap.outerHTML = renderWrap(s); }
+    else render();
+    toast('Hintergrundbild gesetzt!','success');
+  };
+  r.readAsDataURL(f);
+}
+
+function dzOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dzLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function dzDrop(e, zone) {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  const f = e.dataTransfer?.files[0];
+  if (f && f.type.startsWith('image/')) processImg(f, zone);
+}
+function pickImg(zone) { zone.querySelector('input[type="file"]')?.click(); }
+function imgFileChosen(e, zone) { const f = e.target.files[0]; if(f) processImg(f, zone); }
+
+function processImg(file, zone) {
+  const r = new FileReader();
+  r.onload = ev => setImgUrl(zone, ev.target.result);
+  r.readAsDataURL(file);
+}
+
+function setImgUrl(zone, url) {
+  const id = zone.dataset.s, field = zone.dataset.f;
+  const s = sd.sections.find(x=>x.id===id); if(!s) return;
+  const parts = field.split('.');
+  if (parts.length === 1) s.data[field] = url;
+  else if (parts.length === 3) { const [arr,idx,key]=parts; if(s.data[arr]?.[+idx]) s.data[arr][+idx][key]=url; }
+  markDirty();
+  // Re-render only this section's wrapper
+  const wrap = document.querySelector(`[data-id="${id}"]`);
+  if (wrap) wrap.outerHTML = renderWrap(s);
+  toast('Bild gesetzt!','success');
+}
+
+// ─────────────────────────────────────────────────────
+// AI Prompt
+// ─────────────────────────────────────────────────────
+async function applyAI() {
+  const prompt = document.getElementById('aiInput').value.trim();
+  if (!prompt) { toast('Bitte Prompt eingeben','error'); return; }
+  const btn = document.getElementById('aiBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin" style="width:13px;height:13px;border-width:2px"></span> Wird angewendet…';
+  try {
+    const r = await fetch(`/api/builder/${leadId}/ai-prompt`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt })
+    });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.error); }
+    sd = await r.json();
+    render();
+    document.getElementById('aiInput').value = '';
+    toast('KI-Änderungen angewendet!','success');
+  } catch(e) { toast('Fehler: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.innerHTML='✨ Apply AI'; }
+}
+
+// ─────────────────────────────────────────────────────
+// Save & Export
+// ─────────────────────────────────────────────────────
+async function saveWebsite() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled=true; btn.innerHTML='⏳ Speichert…';
+  try {
+    const r = await fetch(`/api/builder/${leadId}/save`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(sd)
+    });
+    if (!r.ok) throw new Error('Speichern fehlgeschlagen');
+    dirty = false; toast('Gespeichert!','success');
+  } catch(e) { toast('Fehler: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.innerHTML='💾 Speichern'; }
+}
+
+function markDirty() {
+  dirty = true;
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(()=>{ if(dirty) saveWebsite(); }, 4000);
+}
+
+function exportHtml() {
+  const g = sd.globalStyles||{};
+  const sectionsHtml = sd.sections.map(s => {
+    let h = renderSec(s);
+    // Strip editor attrs
+    h = h.replace(/ contenteditable/g,'')
+         .replace(/ data-s="[^"]*"/g,'')
+         .replace(/ data-f="[^"]*"/g,'')
+         .replace(/ onblur="[^"]*"/g,'')
+         .replace(/ ondragover="[^"]*"/g,'')
+         .replace(/ ondragleave="[^"]*"/g,'')
+         .replace(/ ondrop="[^"]*"/g,'')
+         .replace(/ onclick="(?:pickImg|pickHeroBg|heroFileChosen)[^"]*"/g,'')
+         .replace(/<div class="idrop">[\s\S]*?<\/div>/g,'')
+         .replace(/<input[^>]*type="file"[^>]*>/g,'')
+         .replace(/<button class="hero-imgbtn"[\s\S]*?<\/button>/g,'')
+         .replace(/<input[^>]*id="heroFile[^"]*"[^>]*>/g,'');
+    return h;
+  }).join('\n');
+
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(sd.businessName||'Website')}</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:${g.fontFamily||'Segoe UI, system-ui, sans-serif'}}
+${exportCSS()}
+${g.animations ? animCSS() : ''}
+</style>
+</head>
+<body>
+${sectionsHtml}
+</body>
+</html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download = (sd.businessName||'website').replace(/\s+/g,'-').toLowerCase()+'.html';
+  a.click();
+  toast('HTML exportiert!','success');
+}
+
+function exportCSS() {
+  return `.ws-hero{min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.ws-hero-ov{position:absolute;inset:0;background:rgba(0,0,0,.42)}
+.ws-hero-cnt{position:relative;z-index:2;max-width:720px;width:100%}
+.ws-hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;margin-bottom:14px;line-height:1.1}
+.ws-hero .sub{font-size:1.2rem;margin-bottom:10px;opacity:.92}
+.ws-hero .desc{font-size:1rem;margin-bottom:28px;opacity:.8;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6}
+.ws-hero .hbtn{display:inline-block;padding:14px 34px;border-radius:50px;font-size:1rem;font-weight:700;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.ws-hero .hbtn:hover{transform:translateY(-2px)}
+.ws-services{padding:80px 40px}.ws-services h2{text-align:center;font-size:2.2rem;font-weight:700;margin-bottom:50px}
+.ws-sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;max-width:1100px;margin:0 auto}
+.ws-sc{padding:32px 24px;border-radius:16px;text-align:center;transition:transform .2s,box-shadow .2s}
+.ws-sc:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.ws-sc-icon{font-size:2.4rem;margin-bottom:14px;display:block}
+.ws-sc-title{font-size:1.15rem;font-weight:700;margin-bottom:9px}
+.ws-sc-desc{font-size:.92rem;line-height:1.65;opacity:.78}
+.ws-gallery{padding:80px 40px}.ws-gallery h2{text-align:center;font-size:2.2rem;font-weight:700;margin-bottom:50px}
+.ws-gg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1100px;margin:0 auto}
+.ws-gi{aspect-ratio:4/3;border-radius:12px;overflow:hidden}
+.ws-gi img{width:100%;height:100%;object-fit:cover}
+.ws-reviews{padding:80px 40px}.ws-reviews h2{text-align:center;font-size:2.2rem;font-weight:700;margin-bottom:50px}
+.ws-rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:22px;max-width:1100px;margin:0 auto}
+.ws-rc{padding:28px;border-radius:16px;transition:transform .2s}
+.ws-rc:hover{transform:translateY(-2px)}
+.ws-stars{color:#f59e0b;font-size:1.15rem;margin-bottom:11px}
+.ws-rtxt{font-size:.93rem;line-height:1.65;margin-bottom:14px;font-style:italic;opacity:.85}
+.ws-rauth{font-weight:700;font-size:.9rem}
+.ws-contact{padding:80px 40px;text-align:center}.ws-contact h2{font-size:2.2rem;font-weight:700;margin-bottom:50px}
+.ws-cg{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.ws-ci{display:flex;flex-direction:column;align-items:center;gap:7px}
+.ws-cicon{font-size:2rem}.ws-clabel{font-size:.8rem;font-weight:700;text-transform:uppercase;opacity:.55}
+.ws-cval{font-size:1.05rem;font-weight:600}
+.ws-footer{padding:30px 40px;text-align:center}
+.ws-fl{display:flex;gap:18px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.ws-fl a{color:inherit;opacity:.55;text-decoration:none;font-size:.88rem}
+.ws-fl a:hover{opacity:1}`;
+}
+
+function animCSS() {
+  return `
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.ws-hero,.ws-services,.ws-gallery,.ws-reviews,.ws-contact,.ws-footer{animation:fadeInUp .7s ease both}`;
+}
+
+function addAnimCSS() {
+  if (document.getElementById('animStyle')) return;
+  const s = document.createElement('style');
+  s.id = 'animStyle';
+  s.textContent = `@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.sw{animation:fadeInUp .6s ease both}
+.ws-sc,.ws-rc{transition:transform .2s,box-shadow .2s}
+.ws-sc:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.ws-rc:hover{transform:translateY(-2px)}
+.hbtn:hover{transform:translateY(-2px)!important}`;
+  document.head.appendChild(s);
+}
+
+// ─────────────────────────────────────────────────────
+// Device switcher
+// ─────────────────────────────────────────────────────
+function setDevice(d) {
+  const c = document.getElementById('canvas');
+  c.className = 'canvas ' + d;
+  document.querySelectorAll('.dev-btn').forEach(b=>b.classList.toggle('active', b.dataset.device===d));
+}
+
+// ─────────────────────────────────────────────────────
+// Navigation
+// ─────────────────────────────────────────────────────
+function goBack() {
+  if (dirty && !confirm('Ungespeicherte Änderungen vorhanden. Trotzdem verlassen?')) return;
+  location.href = '/';
+}
+window.addEventListener('beforeunload', e=>{ if(dirty){ e.preventDefault(); return e.returnValue=''; } });
+
+// ─────────────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────────────
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toHex(c) {
+  if (!c || c.startsWith('#')) return c||'#000000';
+  // convert rgb() to hex
+  const m = c.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (!m) return '#000000';
+  return '#'+[1,2,3].map(i=>parseInt(m[i]).toString(16).padStart(2,'0')).join('');
+}
+
+function adjustColor(hex, amt) {
+  try {
+    if (!hex || !hex.startsWith('#')) return hex;
+    let n = parseInt(hex.replace('#',''), 16);
+    const r = Math.min(255, (n>>16)+amt);
+    const g = Math.min(255, ((n>>8)&0xff)+amt);
+    const b = Math.min(255, (n&0xff)+amt);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  } catch { return hex; }
+}
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show '+(type||'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 3200);
+}
+
+// ─────────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>
