@@ -1,13 +1,97 @@
 require('dotenv').config({ override: true });
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
-const Anthropic = require('@anthropic-ai/sdk');
+const express  = require('express');
+const fs       = require('fs');
+const path     = require('path');
+const fetch    = require('node-fetch');
+const Anthropic= require('@anthropic-ai/sdk');
 const multer   = require('multer');
+const crypto   = require('crypto');
 
 const app = express();
 app.use(express.json());
+
+// ── Passwort-Schutz ──────────────────────────────────────────────
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'geheim123';
+const sessions = new Set();
+
+function makeToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// Login-Seite
+app.get('/login', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login – Lead Dashboard</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .card{background:#1a1d27;border:1px solid #2d3148;border-radius:16px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .logo{font-size:28px;text-align:center;margin-bottom:8px}
+  h1{text-align:center;font-size:18px;font-weight:700;margin-bottom:6px}
+  p{text-align:center;font-size:13px;color:#718096;margin-bottom:28px}
+  input{width:100%;background:#22263a;border:1px solid #2d3148;color:#e2e8f0;padding:12px 14px;border-radius:10px;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .15s}
+  input:focus{border-color:#6366f1}
+  button{width:100%;background:#6366f1;color:#fff;border:none;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+  button:hover{opacity:.88}
+  .err{color:#fca5a5;font-size:13px;text-align:center;margin-top:12px;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">📍</div>
+  <h1>Lead Dashboard</h1>
+  <p>Bitte melde dich an</p>
+  <form method="POST" action="/login">
+    <input type="password" name="password" placeholder="Passwort" autofocus required>
+    <button type="submit">Anmelden</button>
+  </form>
+  ${req.query.err ? '<div class="err" style="display:block">❌ Falsches Passwort</div>' : ''}
+</div>
+</body>
+</html>`);
+});
+
+// Login verarbeiten
+app.use(express.urlencoded({ extended: false }));
+app.post('/login', (req, res) => {
+  if (req.body.password === DASHBOARD_PASSWORD) {
+    const token = makeToken();
+    sessions.add(token);
+    res.setHeader('Set-Cookie', `ld_session=${token}; Path=/; HttpOnly; Max-Age=86400`);
+    res.redirect('/');
+  } else {
+    res.redirect('/login?err=1');
+  }
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+  const cookie = parseCookie(req.headers.cookie || '');
+  sessions.delete(cookie.ld_session);
+  res.setHeader('Set-Cookie', 'ld_session=; Path=/; Max-Age=0');
+  res.redirect('/login');
+});
+
+function parseCookie(str) {
+  return str.split(';').reduce((acc, part) => {
+    const [k, v] = part.trim().split('=');
+    if (k) acc[k] = v || '';
+    return acc;
+  }, {});
+}
+
+// Auth-Middleware – schützt alle Routen außer /login
+function requireAuth(req, res, next) {
+  const cookie = parseCookie(req.headers.cookie || '');
+  if (sessions.has(cookie.ld_session)) return next();
+  if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Nicht eingeloggt' });
+  res.redirect('/login');
+}
+app.use(requireAuth);
 app.use(express.static(__dirname));
 
 const LEADS_FILE = path.join(__dirname, 'leads.json');
@@ -67,14 +151,27 @@ function haversine(lat1, lon1, lat2, lon2) {
   return Math.round(R * 2 * Math.asin(Math.sqrt(a)) * 10) / 10;
 }
 
-// PLZ → lat/lng via Google Geocoding
+// PLZ → lat/lng via OpenStreetMap (kostenlos, kein API-Key nötig)
 async function geocodePLZ(plz, apiKey) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${plz},Deutschland&key=${apiKey}`;
-  const resp = await fetch(url);
-  const data = await resp.json();
-  if (data.status !== 'OK' || !data.results[0]) throw new Error(`PLZ ${plz} nicht gefunden`);
-  const loc = data.results[0].geometry.location;
-  return { lat: loc.lat, lng: loc.lng, label: data.results[0].formatted_address };
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${plz}&country=de&format=json&limit=1`;
+    const resp = await fetch(url, { headers: { 'User-Agent': 'LeadDashboard/1.0' } });
+    const data = await resp.json();
+    if (data && data[0]) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), label: data[0].display_name };
+    }
+  } catch (e) { /* fallback */ }
+  // Fallback: Google Geocoding
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${plz},Deutschland&key=${apiKey}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.status === 'OK' && data.results[0]) {
+      const loc = data.results[0].geometry.location;
+      return { lat: loc.lat, lng: loc.lng, label: data.results[0].formatted_address };
+    }
+  } catch (e) { /* fallback */ }
+  throw new Error(`PLZ ${plz} nicht gefunden`);
 }
 
 function readLeads() {
