@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Lead Dashboard</title>
 <style>
 :root{
@@ -11,38 +11,40 @@
   --green:#16a34a;--yellow:#d97706;--red:#dc2626;--radius:10px;
   --shadow:0 1px 3px rgba(0,0,0,.4);
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
 
 /* ── Header ── */
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:62px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow);flex-wrap:wrap}
-.logo{font-size:15px;font-weight:700;color:var(--accent);white-space:nowrap;flex-shrink:0}
-.si{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:13px;outline:none;transition:border-color .15s}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.header-row1{display:flex;align-items:center;gap:10px}
+.logo{font-size:15px;font-weight:700;color:var(--accent);flex:1;white-space:nowrap}
+.header-row2{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.si{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:13px;outline:none;transition:border-color .15s}
 .si:focus{border-color:var(--accent)}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--radius);border:none;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 13px;border-radius:var(--radius);border:none;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap;text-decoration:none;min-height:36px}
 .btn:hover:not(:disabled){opacity:.85}
 .btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:active{transform:scale(.97)}
 .btn-primary{background:var(--accent);color:#fff}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
 .btn-danger{background:#7f1d1d55;border:1px solid #7f1d1d88;color:#fca5a5}
 .btn-danger:hover{background:#7f1d1d88!important;opacity:1}
-.btn-sm{padding:4px 9px;font-size:11px;border-radius:7px}
-.refresh-info{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:7px;min-height:32px}
+.btn-fav-off{background:transparent;border:1px solid #78350f55;color:#78350f99;font-size:15px}
+.btn-fav-on{background:#78350f44;border:1px solid #fb923c88;color:#fb923c;font-size:15px}
+.refresh-info{font-size:11px;color:var(--muted);white-space:nowrap}
 
 /* ── Main ── */
-main{padding:18px;max-width:1700px;margin:0 auto}
+main{padding:14px;max-width:1700px;margin:0 auto}
 
 /* ── Metrics ── */
-.metrics{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:18px}
-@media(max-width:1100px){.metrics{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s}
+.metrics{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s}
 .metric:hover{border-color:var(--accent)}
 .metric.active{border-color:var(--accent);background:rgba(99,102,241,.08)}
-.metric-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.metric-value{font-size:26px;font-weight:800;line-height:1}
-.metric-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.metric-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:800;line-height:1}
 .m-total .metric-value{color:var(--accent)}
 .m-kontaktiert .metric-value{color:#fcd34d}
 .m-zusage .metric-value{color:#86efac}
@@ -52,39 +54,32 @@ main{padding:18px;max-width:1700px;margin:0 auto}
 .m-todo .metric-value{color:#a78bfa}
 
 /* ── Bulk toolbar ── */
-.bulk-bar{display:none;align-items:center;gap:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:var(--radius);padding:9px 14px;margin-bottom:12px}
-.bulk-bar.show{display:flex}
-.bulk-info{font-size:13px;font-weight:600;color:var(--accent);flex:1}
+.bulk-bar{display:flex;align-items:center;gap:6px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;flex-wrap:wrap}
+.bulk-info{font-size:12px;font-weight:600;color:var(--accent);flex:1;min-width:80px}
 
-/* ── Toolbar ── */
-.toolbar{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.filter-group{display:flex;gap:3px;flex-wrap:wrap}
-.filter-btn{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+/* ── Filter tabs ── */
+.toolbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.filter-scroll{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;flex:1}
+.filter-scroll::-webkit-scrollbar{display:none}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:30px}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.spacer{flex:1}
 
-/* ── Table ── */
+/* ── Table (Desktop) ── */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse}
-thead th{background:var(--surface2);padding:9px 11px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th{background:var(--surface2);padding:9px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);white-space:nowrap}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
 tbody tr.selected{background:rgba(99,102,241,.08);border-left:3px solid var(--accent)}
-td{padding:10px 11px;vertical-align:middle}
-.td-name{font-weight:600;max-width:190px}
+td{padding:9px 10px;vertical-align:middle}
+.td-name{font-weight:600;max-width:180px}
 .td-name small{display:block;font-weight:400;color:var(--muted);font-size:10px;margin-top:1px}
-.td-addr{color:var(--muted);font-size:12px;max-width:200px;line-height:1.3}
-
-/* ── Checkbox ── */
+.td-addr{color:var(--muted);font-size:12px;max-width:180px;line-height:1.3}
 input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
-
-/* ── Stars ── */
-.stars{color:#f59e0b;font-size:12px;letter-spacing:.5px}
+.stars{color:#f59e0b;font-size:12px}
 .rat-count{color:var(--muted);font-size:10px}
-
-/* ── Status ── */
 .status-select{border:none;border-radius:20px;padding:4px 22px 4px 9px;font-size:11px;font-weight:600;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23718096'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center}
 .s-neu{background:#1e3a5f33;color:#60a5fa}
 .s-kontaktiert{background:#78350f33;color:#fcd34d}
@@ -93,17 +88,35 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
 .s-unentschieden{background:#37415133;color:#9ca3af}
 .s-favorit{background:#7c2d1233;color:#fb923c}
 .s-todo{background:#4c1d9533;color:#a78bfa}
-
-/* ── Kat tag ── */
 .kat-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;background:var(--accent)22;color:var(--accent)}
+.actions{display:flex;gap:4px;align-items:center}
 
-/* ── Actions ── */
-.actions{display:flex;gap:4px}
-.btn-maps{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
-.btn-del-single{background:#7f1d1d33;border:1px solid #7f1d1d55;color:#fca5a5}
+/* ── Mobile Cards ── */
+.cards-wrap{display:none}
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;position:relative;transition:border-color .15s}
+.lead-card.selected{border-color:var(--accent);background:rgba(99,102,241,.06)}
+.lead-card.fav-card{border-color:#fb923c55}
+.card-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.card-check{flex-shrink:0;margin-top:2px}
+.card-title{flex:1;min-width:0}
+.card-name{font-weight:700;font-size:14px;line-height:1.2;margin-bottom:2px}
+.card-kat{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;background:var(--accent)22;color:var(--accent);margin-bottom:4px}
+.card-addr{font-size:12px;color:var(--muted);line-height:1.3}
+.card-fav-btn{flex-shrink:0;background:transparent;border:none;font-size:22px;cursor:pointer;padding:2px 4px;line-height:1;border-radius:8px;transition:transform .15s}
+.card-fav-btn:active{transform:scale(1.3)}
+.card-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.card-phone{font-size:12px;font-weight:500;color:var(--text)}
+.card-phone a{color:var(--accent);text-decoration:none}
+.card-dist{font-size:12px;color:var(--accent);font-weight:700}
+.card-stars{font-size:12px;color:#f59e0b}
+.card-rating-text{font-size:11px;color:var(--muted)}
+.card-footer{display:flex;align-items:center;gap:6px}
+.card-status-wrap{flex:1}
+.card-actions{display:flex;gap:5px}
+.card-note-preview{font-size:11px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.4;display:flex;gap:4px;align-items:flex-start}
 
 /* ── Toast ── */
-#toast{position:fixed;bottom:22px;right:22px;background:#1e293b;color:#e2e8f0;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 24px rgba(0,0,0,.5);transform:translateY(70px);opacity:0;transition:all .3s;z-index:999;max-width:320px}
+#toast{position:fixed;bottom:22px;right:14px;left:14px;max-width:360px;margin:0 auto;background:#1e293b;color:#e2e8f0;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 24px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;text-align:center}
 #toast.show{transform:translateY(0);opacity:1}
 #toast.error{background:#7f1d1d}
 #toast.success{background:#14532d}
@@ -117,67 +130,113 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
 .empty-icon{font-size:40px;margin-bottom:10px}
 
 /* ── Note modal ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:460px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.modal h3{font-size:15px;font-weight:700;margin-bottom:6px}
-.modal .lead-info{font-size:12px;color:var(--muted);margin-bottom:14px}
-.modal textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;resize:vertical;min-height:130px;outline:none;font-family:inherit;line-height:1.5}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 0 0;padding:22px;width:100%;max-width:520px;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.modal .lead-info{font-size:12px;color:var(--muted);margin-bottom:12px}
+.modal textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:14px;resize:none;height:130px;outline:none;font-family:inherit;line-height:1.5}
 .modal textarea:focus{border-color:var(--accent)}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
 
 /* ── Confirm modal ── */
-.confirm-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:380px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
+.confirm-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 0 0;padding:28px;width:100%;max-width:420px;box-shadow:0 -10px 40px rgba(0,0,0,.5);text-align:center}
 .confirm-modal p{color:var(--muted);font-size:13px;margin:10px 0 22px}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+═══════════════════════════════════════ */
+
+/* Tablet */
+@media(max-width:1100px){
+  .metrics{grid-template-columns:repeat(4,1fr)}
+}
+
+/* Mobile */
+@media(max-width:700px){
+  header{padding:10px 12px}
+  .header-row1{gap:8px}
+  .header-row2{gap:5px}
+  .si{font-size:14px;padding:8px 10px}
+  #plzInput{width:75px}
+  .refresh-info{display:none}
+
+  main{padding:10px}
+
+  .metrics{grid-template-columns:repeat(4,1fr);gap:6px}
+  .metric{padding:9px 8px}
+  .metric-value{font-size:18px}
+  .metric-label{font-size:8px}
+
+  .bulk-bar{gap:5px;padding:8px 10px}
+  .bulk-bar .btn-sm{font-size:10px;padding:5px 7px}
+  .bulk-info{font-size:11px;width:100%;flex:none}
+
+  /* Filtergrupppe scrollbar */
+  .toolbar{gap:4px;margin-bottom:8px}
+
+  /* Tabelle verstecken → Card-View zeigen */
+  .table-wrap{display:none}
+  .cards-wrap{display:block}
+
+  /* Modal von unten (sheet style) */
+  .modal-bg{align-items:flex-end}
+  .modal{border-radius:18px 18px 0 0;padding:20px}
+  .confirm-modal{border-radius:18px 18px 0 0}
+}
+
+@media(max-width:400px){
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .header-row2{gap:4px}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">📍 Lead Dashboard</div>
-
-  <select class="si" id="katSelect">
-    <option value="Friseur">✂️ Friseur</option>
-    <option value="Bäckerei">🥖 Bäckerei</option>
-    <option value="Autowerkstatt">🔧 Autowerkstatt</option>
-    <option value="Zahnarzt">🦷 Zahnarzt</option>
-    <option value="Metzger">🥩 Metzger</option>
-    <option value="Blumenladen">🌸 Blumenladen</option>
-    <option value="Elektriker">⚡ Elektriker</option>
-    <option value="Malerbetrieb">🎨 Malerbetrieb</option>
-    <option value="Gartenservice">🌿 Gartenservice</option>
-    <option value="Restaurant">🍽️ Restaurant</option>
-    <option value="Reinigung">🧹 Reinigung</option>
-    <option value="Physiotherapie">💪 Physiotherapie</option>
-  </select>
-
-  <input class="si" id="plzInput" type="text" placeholder="PLZ" value="67574" style="width:80px">
-
-  <select class="si" id="radiusSelect">
-    <option value="5">5 km</option>
-    <option value="10" selected>10 km</option>
-    <option value="20">20 km</option>
-    <option value="30">30 km</option>
-    <option value="50">50 km</option>
-  </select>
-
-  <button class="btn btn-primary" id="searchBtn" onclick="doSearch()">
-    <span id="searchIcon">🔍</span> Suchen
-  </button>
-  <button class="btn btn-outline" id="ratingBtn" onclick="refreshRatings(false)">⭐ Ratings</button>
-  <button class="btn btn-outline" onclick="exportCSV()">⬇️ CSV</button>
-
-  <div class="refresh-info" id="refreshInfo">Auto-Refresh: 30s</div>
-  <a href="/logout" class="btn btn-outline" style="font-size:11px;padding:4px 10px">🚪</a>
+  <div class="header-row1">
+    <div class="logo">📍 Lead Dashboard</div>
+    <div class="refresh-info" id="refreshInfo">Auto-Refresh: 30s</div>
+    <a href="/logout" class="btn btn-outline btn-sm">🚪</a>
+  </div>
+  <div class="header-row2">
+    <select class="si" id="katSelect" style="flex:1;min-width:0">
+      <option value="Friseur">✂️ Friseur</option>
+      <option value="Bäckerei">🥖 Bäckerei</option>
+      <option value="Autowerkstatt">🔧 Autowerkstatt</option>
+      <option value="Zahnarzt">🦷 Zahnarzt</option>
+      <option value="Metzger">🥩 Metzger</option>
+      <option value="Blumenladen">🌸 Blumenladen</option>
+      <option value="Elektriker">⚡ Elektriker</option>
+      <option value="Malerbetrieb">🎨 Malerbetrieb</option>
+      <option value="Gartenservice">🌿 Gartenservice</option>
+      <option value="Restaurant">🍽️ Restaurant</option>
+      <option value="Reinigung">🧹 Reinigung</option>
+      <option value="Physiotherapie">💪 Physiotherapie</option>
+    </select>
+    <input class="si" id="plzInput" type="text" placeholder="PLZ" value="67574" style="width:80px">
+    <select class="si" id="radiusSelect">
+      <option value="5">5km</option>
+      <option value="10" selected>10km</option>
+      <option value="20">20km</option>
+      <option value="30">30km</option>
+      <option value="50">50km</option>
+    </select>
+    <button class="btn btn-primary" id="searchBtn" onclick="doSearch()">
+      <span id="searchIcon">🔍</span><span class="btn-label"> Suchen</span>
+    </button>
+    <button class="btn btn-outline" id="ratingBtn" onclick="refreshRatings(false)" title="Ratings aktualisieren">⭐</button>
+    <button class="btn btn-outline" onclick="exportCSV()" title="CSV Export">⬇️</button>
+  </div>
 </header>
 
 <main>
-  <!-- Metrics (klickbar als Filter) -->
+  <!-- Metrics -->
   <div class="metrics">
     <div class="metric m-total active" data-f="alle" onclick="setFilter('alle')">
       <div class="metric-label">Gesamt</div>
       <div class="metric-value" id="m-total">0</div>
-      <div class="metric-sub">alle Leads</div>
     </div>
     <div class="metric m-kontaktiert" data-f="kontaktiert" onclick="setFilter('kontaktiert')">
       <div class="metric-label">Kontaktiert</div>
@@ -192,7 +251,7 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       <div class="metric-value" id="m-absage">0</div>
     </div>
     <div class="metric m-unentschieden" data-f="unentschieden" onclick="setFilter('unentschieden')">
-      <div class="metric-label">❓ Unentschieden</div>
+      <div class="metric-label">❓ Unentsch.</div>
       <div class="metric-value" id="m-unentschieden">0</div>
     </div>
     <div class="metric m-favorit" data-f="favorit" onclick="setFilter('favorit')">
@@ -200,24 +259,24 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       <div class="metric-value" id="m-favorit">0</div>
     </div>
     <div class="metric m-todo" data-f="todo" onclick="setFilter('todo')">
-      <div class="metric-label">📋 Zu erledigen</div>
+      <div class="metric-label">📋 Erledigen</div>
       <div class="metric-value" id="m-todo">0</div>
     </div>
   </div>
 
-  <!-- Bulk-Aktionsleiste (erscheint wenn Auswahl aktiv) -->
+  <!-- Bulk-Aktionsleiste -->
   <div class="bulk-bar" id="bulkBar">
-    <span class="bulk-info" id="bulkInfo">0 ausgewählt</span>
-    <button class="btn btn-outline btn-sm" onclick="selectAll()">Alle auswählen</button>
-    <button class="btn btn-outline btn-sm" onclick="clearSelection()">Auswahl aufheben</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 Ausgewählte löschen</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteVisible()">🗑 Alle sichtbaren löschen</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteAll()">⚠️ Alle löschen</button>
+    <span class="bulk-info" id="bulkInfo">Massenaktionen</span>
+    <button class="btn btn-outline btn-sm" onclick="selectAll()">Alle ✓</button>
+    <button class="btn btn-outline btn-sm" onclick="clearSelection()">✗ Aufheben</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 Auswahl</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteVisible()">🗑 Sichtbare</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteAll()">⚠️ Alle</button>
   </div>
 
   <!-- Filter-Tabs -->
   <div class="toolbar">
-    <div class="filter-group" id="filterGroup">
+    <div class="filter-scroll" id="filterGroup">
       <button class="filter-btn active" data-f="alle" onclick="setFilter('alle')">Alle</button>
       <button class="filter-btn" data-f="neu" onclick="setFilter('neu')">Neu</button>
       <button class="filter-btn" data-f="kontaktiert" onclick="setFilter('kontaktiert')">Kontaktiert</button>
@@ -227,11 +286,10 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       <button class="filter-btn" data-f="favorit" onclick="setFilter('favorit')">⭐ Favoriten</button>
       <button class="filter-btn" data-f="todo" onclick="setFilter('todo')">📋 Zu erledigen</button>
     </div>
-    <div class="spacer"></div>
-    <span id="countLabel" style="font-size:12px;color:var(--muted)"></span>
+    <span id="countLabel" style="font-size:12px;color:var(--muted);white-space:nowrap;padding-left:6px"></span>
   </div>
 
-  <!-- Table -->
+  <!-- Desktop: Table -->
   <div class="table-wrap">
     <table>
       <thead>
@@ -252,11 +310,17 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       </tbody>
     </table>
   </div>
+
+  <!-- Mobile: Cards -->
+  <div class="cards-wrap" id="cardsWrap">
+    <div class="empty"><div class="empty-icon">🔍</div><p>Noch keine Leads.</p></div>
+  </div>
 </main>
 
 <!-- Notiz Modal -->
 <div class="modal-bg" id="noteModal">
   <div class="modal">
+    <div class="modal-handle"></div>
     <h3>📝 Notiz</h3>
     <div class="lead-info" id="noteLead"></div>
     <textarea id="noteText" placeholder="Notiz, Gesprächsprotokoll, nächste Schritte…"></textarea>
@@ -270,6 +334,7 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
 <!-- Confirm Modal -->
 <div class="modal-bg" id="confirmModal">
   <div class="confirm-modal">
+    <div class="modal-handle"></div>
     <div style="font-size:36px;margin-bottom:10px">⚠️</div>
     <h3 id="confirmTitle">Wirklich löschen?</h3>
     <p id="confirmText"></p>
@@ -328,7 +393,10 @@ async function doSearch() {
     toast(`✅ ${d.added} neue Leads gefunden`,'success');
     await loadLeads(true);
   } catch(e) { toast('❌ '+e.message,'error'); }
-  finally { btn.disabled=false; document.getElementById('searchIcon').outerHTML='<span id="searchIcon">🔍</span>'; }
+  finally {
+    btn.disabled=false;
+    document.getElementById('searchIcon').outerHTML='<span id="searchIcon">🔍</span>';
+  }
 }
 
 async function updateStatus(id, status) {
@@ -337,6 +405,18 @@ async function updateStatus(id, status) {
   const idx = leads.findIndex(l=>l.id===id);
   if(idx!==-1) leads[idx]=updated;
   renderAll();
+}
+
+async function toggleFavorit(id) {
+  const lead = leads.find(l=>l.id===id);
+  if(!lead) return;
+  const newStatus = lead.status === 'favorit' ? 'neu' : 'favorit';
+  const r = await fetch(`/api/leads/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});
+  const updated = await r.json();
+  const idx = leads.findIndex(l=>l.id===id);
+  if(idx!==-1) leads[idx]=updated;
+  renderAll();
+  toast(newStatus==='favorit'?'⭐ Als Favorit markiert':'Favorit entfernt','success');
 }
 
 async function deleteSingle(id) {
@@ -350,13 +430,12 @@ async function deleteSingle(id) {
 }
 
 async function deleteSelected() {
-  if(!selected.size) return;
-  showConfirm(`${selected.size} Leads löschen?`,'Alle markierten Leads werden dauerhaft gelöscht.', async()=>{
+  if(!selected.size) return toast('Keine Leads ausgewählt','error');
+  showConfirm(`${selected.size} Leads löschen?','Alle markierten Leads werden dauerhaft gelöscht.`, async()=>{
     const ids = [...selected];
     await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
     leads = leads.filter(l=>!ids.includes(l.id));
-    selected.clear();
-    renderAll();
+    selected.clear(); renderAll();
     toast(`${ids.length} Leads gelöscht`,'success');
   });
 }
@@ -367,8 +446,7 @@ async function deleteVisible() {
   showConfirm(`${ids.length} sichtbare Leads löschen?','Alle aktuell angezeigten Leads werden gelöscht.`, async()=>{
     await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
     leads = leads.filter(l=>!ids.includes(l.id));
-    selected.clear();
-    renderAll();
+    selected.clear(); renderAll();
     toast(`${ids.length} Leads gelöscht`,'success');
   });
 }
@@ -376,8 +454,7 @@ async function deleteVisible() {
 async function deleteAll() {
   showConfirm('ALLE Leads löschen?',`Alle ${leads.length} Leads werden unwiderruflich gelöscht!`, async()=>{
     await fetch('/api/leads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:'all'})});
-    leads=[]; selected.clear();
-    renderAll();
+    leads=[]; selected.clear(); renderAll();
     toast('Alle Leads gelöscht','success');
   });
 }
@@ -391,7 +468,7 @@ async function refreshRatings(silent=false) {
     if(d.updated>0){await loadLeads(true);if(!silent)toast(`⭐ ${d.updated} Ratings aktualisiert`,'success');}
     else if(!silent) toast('Ratings bereits aktuell','');
   } catch(e){if(!silent)toast('Fehler: '+e.message,'error');}
-  finally{if(btn){btn.disabled=false;btn.innerHTML='⭐ Ratings';}}
+  finally{if(btn){btn.disabled=false;btn.innerHTML='⭐';}}
 }
 function exportCSV(){window.location.href='/api/export-csv';}
 
@@ -402,7 +479,7 @@ function openNote(id){
   document.getElementById('noteLead').textContent=l?.name||'';
   document.getElementById('noteText').value=l?.notiz||'';
   document.getElementById('noteModal').classList.add('open');
-  setTimeout(()=>document.getElementById('noteText').focus(),50);
+  setTimeout(()=>document.getElementById('noteText').focus(),100);
 }
 function closeNote(){document.getElementById('noteModal').classList.remove('open');noteLeadId=null;}
 async function saveNote(){
@@ -430,53 +507,61 @@ document.getElementById('confirmModal').addEventListener('click',e=>{if(e.target
 function toggleRow(id,cb){
   if(cb.checked) selected.add(id); else selected.delete(id);
   updateBulkBar();
-  const row=cb.closest('tr');
+  const row=cb.closest('tr')||cb.closest('.lead-card');
   if(row) row.classList.toggle('selected',cb.checked);
 }
 function toggleAll(masterCb){
   const filtered=getFiltered();
-  filtered.forEach(l=>{
-    if(masterCb.checked) selected.add(l.id); else selected.delete(l.id);
+  filtered.forEach(l=>{if(masterCb.checked) selected.add(l.id); else selected.delete(l.id);});
+  document.querySelectorAll('.row-check').forEach(cb=>{
+    cb.checked=masterCb.checked;
+    (cb.closest('tr')||cb.closest('.lead-card'))?.classList.toggle('selected',masterCb.checked);
   });
-  document.querySelectorAll('.row-check').forEach(cb=>{cb.checked=masterCb.checked;cb.closest('tr').classList.toggle('selected',masterCb.checked);});
   updateBulkBar();
 }
 function selectAll(){
   leads.forEach(l=>selected.add(l.id));
-  document.querySelectorAll('.row-check').forEach(cb=>{cb.checked=true;cb.closest('tr').classList.add('selected');});
-  document.getElementById('checkAll').checked=true;
+  document.querySelectorAll('.row-check').forEach(cb=>{
+    cb.checked=true;
+    (cb.closest('tr')||cb.closest('.lead-card'))?.classList.add('selected');
+  });
+  const ca=document.getElementById('checkAll');
+  if(ca) ca.checked=true;
   updateBulkBar();
 }
 function clearSelection(){
   selected.clear();
-  document.querySelectorAll('.row-check').forEach(cb=>{cb.checked=false;cb.closest('tr').classList.remove('selected');});
-  document.getElementById('checkAll').checked=false;
+  document.querySelectorAll('.row-check').forEach(cb=>{
+    cb.checked=false;
+    (cb.closest('tr')||cb.closest('.lead-card'))?.classList.remove('selected');
+  });
+  const ca=document.getElementById('checkAll');
+  if(ca) ca.checked=false;
   updateBulkBar();
 }
 function updateBulkBar(){
-  const bar=document.getElementById('bulkBar');
   const info=document.getElementById('bulkInfo');
-  bar.classList.toggle('show',selected.size>0||true); // always show for delete-all
   info.textContent=selected.size>0?`${selected.size} ausgewählt`:'Massenaktionen';
 }
 
 // ── Render ──────────────────────────────────────────────
-function renderAll(){renderMetrics();renderTable();updateBulkBar();}
+function renderAll(){renderMetrics();renderTable();renderCards();updateBulkBar();}
 
 function renderMetrics(){
   document.getElementById('m-total').textContent        = leads.length;
   document.getElementById('m-kontaktiert').textContent  = leads.filter(l=>l.status==='kontaktiert').length;
-  document.getElementById('m-zusage').textContent        = leads.filter(l=>l.status==='zusage').length;
-  document.getElementById('m-absage').textContent        = leads.filter(l=>l.status==='absage').length;
-  document.getElementById('m-unentschieden').textContent = leads.filter(l=>l.status==='unentschieden').length;
-  document.getElementById('m-favorit').textContent       = leads.filter(l=>l.status==='favorit').length;
-  document.getElementById('m-todo').textContent          = leads.filter(l=>l.status==='todo').length;
+  document.getElementById('m-zusage').textContent       = leads.filter(l=>l.status==='zusage').length;
+  document.getElementById('m-absage').textContent       = leads.filter(l=>l.status==='absage').length;
+  document.getElementById('m-unentschieden').textContent= leads.filter(l=>l.status==='unentschieden').length;
+  document.getElementById('m-favorit').textContent      = leads.filter(l=>l.status==='favorit').length;
+  document.getElementById('m-todo').textContent         = leads.filter(l=>l.status==='todo').length;
 }
 
 function getFiltered(){
   return activeFilter==='alle' ? leads : leads.filter(l=>l.status===activeFilter);
 }
 
+/* ─── Desktop Table ─── */
 function renderTable(){
   const filtered=getFiltered();
   document.getElementById('countLabel').textContent=`${filtered.length} Einträge`;
@@ -487,9 +572,14 @@ function renderTable(){
   }
   tbody.innerHTML=filtered.map(l=>{
     const isSel=selected.has(l.id);
-    const stars=l.rating!=null?`<div class="stars">${renderStars(l.rating)}</div><div class="rat-count">${l.rating} (${l.userRatingsTotal||0})</div>`:'<div style="color:var(--muted);font-size:10px">–</div>';
-    const dist=l.distanzKm!=null?`<span style="color:var(--accent);font-weight:600;font-size:12px">${l.distanzKm}km</span>`:'–';
-    const notePreview=l.notiz?`<span style="font-size:11px;color:var(--muted)" title="${esc(l.notiz)}">${esc(l.notiz.slice(0,25))}${l.notiz.length>25?'…':''}</span>`:'<span style="color:var(--border)">–</span>';
+    const isFav=l.status==='favorit';
+    const stars=l.rating!=null
+      ?`<div class="stars">${renderStars(l.rating)}</div><div class="rat-count">${l.rating} (${l.userRatingsTotal||0})</div>`
+      :'<div style="color:var(--muted);font-size:10px">–</div>';
+    const dist=l.distanzKm!=null?`<span style="color:var(--accent);font-weight:700;font-size:12px">${l.distanzKm}km</span>`:'–';
+    const notePreview=l.notiz
+      ?`<span style="font-size:11px;color:var(--muted)" title="${esc(l.notiz)}">${esc(l.notiz.slice(0,25))}${l.notiz.length>25?'…':''}</span>`
+      :'<span style="color:var(--border)">–</span>';
     return `<tr class="${isSel?'selected':''}">
       <td><input type="checkbox" class="row-check" ${isSel?'checked':''} onchange="toggleRow('${l.id}',this)"></td>
       <td class="td-name">${esc(l.name)}<small>${esc(l.kategorie)}${l.suchPLZ?' · PLZ '+l.suchPLZ:''}</small></td>
@@ -508,12 +598,61 @@ function renderTable(){
       <td style="max-width:140px">${notePreview}</td>
       <td>
         <div class="actions">
+          <button class="btn btn-sm ${isFav?'btn-fav-on':'btn-fav-off'}" onclick="toggleFavorit('${l.id}')" title="${isFav?'Favorit entfernen':'Als Favorit markieren'}">${isFav?'★':'☆'}</button>
           <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border)" onclick="openNote('${l.id}')" title="Notiz">📝</button>
-          <button class="btn btn-sm btn-maps" onclick="window.open('${esc(l.mapsUrl)}','_blank')" title="Maps">🗺️</button>
-          <button class="btn btn-sm btn-del-single" onclick="deleteSingle('${l.id}')" title="Löschen">✕</button>
+          <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border)" onclick="window.open('${esc(l.mapsUrl)}','_blank')" title="Maps">🗺️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteSingle('${l.id}')" title="Löschen">✕</button>
         </div>
       </td>
     </tr>`;
+  }).join('');
+}
+
+/* ─── Mobile Cards ─── */
+function renderCards(){
+  const filtered=getFiltered();
+  const wrap=document.getElementById('cardsWrap');
+  if(!filtered.length){
+    wrap.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><p>Keine Leads in dieser Kategorie.</p></div>`;
+    return;
+  }
+  wrap.innerHTML=filtered.map(l=>{
+    const isSel=selected.has(l.id);
+    const isFav=l.status==='favorit';
+    const stars=l.rating!=null?`<span class="card-stars">${renderStars(l.rating)}</span><span class="card-rating-text">&nbsp;${l.rating} (${l.userRatingsTotal||0})</span>`:'';
+    const dist=l.distanzKm!=null?`<span class="card-dist">📍 ${l.distanzKm}km</span>`:'';
+    const phone=l.telefon?`<span class="card-phone"><a href="tel:${esc(l.telefon)}">${esc(l.telefon)}</a></span>`:'';
+    return `<div class="lead-card ${isSel?'selected':''} ${isFav?'fav-card':''}" id="card-${l.id}">
+      <div class="card-header">
+        <div class="card-check">
+          <input type="checkbox" class="row-check" ${isSel?'checked':''} onchange="toggleRow('${l.id}',this)" style="width:18px;height:18px">
+        </div>
+        <div class="card-title">
+          <div class="card-name">${esc(l.name)}</div>
+          <span class="card-kat">${esc(l.kategorie)}</span>
+          <div class="card-addr">${esc(l.adresse)}</div>
+        </div>
+        <button class="card-fav-btn" onclick="toggleFavorit('${l.id}')" title="${isFav?'Favorit entfernen':'Als Favorit markieren'}">${isFav?'⭐':'☆'}</button>
+      </div>
+      <div class="card-meta">
+        ${phone}
+        ${dist}
+        ${stars}
+      </div>
+      <div class="card-footer">
+        <div class="card-status-wrap">
+          <select class="status-select s-${l.status}" onchange="updateStatus('${l.id}',this.value);this.className='status-select s-'+this.value">
+            ${Object.entries(SL).map(([v,lbl])=>`<option value="${v}" ${l.status===v?'selected':''}>${lbl}</option>`).join('')}
+          </select>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border)" onclick="openNote('${l.id}')" title="Notiz">📝</button>
+          <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border)" onclick="window.open('${esc(l.mapsUrl)}','_blank')" title="Maps">🗺️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteSingle('${l.id}')" title="Löschen">🗑</button>
+        </div>
+      </div>
+      ${l.notiz?`<div class="card-note-preview">📝 <span>${esc(l.notiz.slice(0,80))}${l.notiz.length>80?'…':''}</span></div>`:''}
+    </div>`;
   }).join('');
 }
 
@@ -529,6 +668,7 @@ function setFilter(f){
   document.querySelectorAll('.metric').forEach(m=>m.classList.toggle('active',m.dataset.f===f));
   selected.clear();
   renderTable();
+  renderCards();
   updateBulkBar();
 }
 
