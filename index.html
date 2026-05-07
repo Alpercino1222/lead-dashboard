@@ -213,8 +213,22 @@ input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac
       <option value="Gartenservice">🌿 Gartenservice</option>
       <option value="Restaurant">🍽️ Restaurant</option>
       <option value="Reinigung">🧹 Reinigung</option>
+      <option value="Gebäudereinigung">🏢 Gebäudereinigung</option>
       <option value="Physiotherapie">💪 Physiotherapie</option>
       <option value="Tierarzt">🐾 Tierarzt</option>
+      <option value="Sanitär">🚿 Sanitär / Klempner</option>
+      <option value="Schreiner">🪚 Schreiner / Tischler</option>
+      <option value="Dachdecker">🏠 Dachdecker</option>
+      <option value="Nagelstudio">💅 Nagelstudio</option>
+      <option value="Kosmetik">✨ Kosmetik</option>
+      <option value="Steuerberater">📊 Steuerberater</option>
+      <option value="Apotheke">💊 Apotheke</option>
+      <option value="Optiker">👓 Optiker</option>
+      <option value="Fahrschule">🚗 Fahrschule</option>
+      <option value="Umzugsunternehmen">📦 Umzugsunternehmen</option>
+      <option value="Schlüsseldienst">🔑 Schlüsseldienst</option>
+      <option value="Fotograf">📷 Fotograf</option>
+      <option value="Fitnessstudio">🏋️ Fitnessstudio</option>
     </select>
     <input class="si" id="plzInput" type="text" placeholder="PLZ" value="67574" style="width:80px">
     <select class="si" id="radiusSelect">
@@ -453,11 +467,20 @@ async function deleteSelected() {
 async function deleteAll() {
   const filtered = getFiltered();
   if(!filtered.length) return toast('Keine Leads vorhanden','error');
-  // Favoriten IMMER ausnehmen
-  const ids = filtered.filter(l=>l.status!=='favorit').map(l=>l.id);
-  const favCount = filtered.filter(l=>l.status==='favorit').length;
-  if(!ids.length) return toast('Nur Favoriten vorhanden – nichts gelöscht','');
-  const favHint = favCount>0 ? ` (${favCount} Favorit${favCount>1?'en':''} bleiben erhalten)` : '';
+
+  let ids, favHint = '';
+  if (activeFilter === 'favorit') {
+    // In der Favoriten-Ansicht dürfen Favoriten explizit gelöscht werden
+    ids = filtered.map(l=>l.id);
+  } else {
+    // In allen anderen Ansichten Favoriten grundsätzlich schützen
+    ids = filtered.filter(l=>l.status!=='favorit').map(l=>l.id);
+    const favCount = filtered.filter(l=>l.status==='favorit').length;
+    if(!ids.length) return toast('Nur Favoriten vorhanden – nichts gelöscht','');
+    favHint = favCount>0 ? ` (${favCount} Favorit${favCount>1?'en':''} bleiben erhalten)` : '';
+  }
+
+  if(!ids.length) return toast('Keine Leads vorhanden','error');
   showConfirm(
     `${ids.length} Leads löschen?`,
     `Alle Leads in dieser Ansicht werden unwiderruflich gelöscht!${favHint}`,
